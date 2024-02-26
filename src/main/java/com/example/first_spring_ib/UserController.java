@@ -57,6 +57,40 @@ public class UserController {
 
     }
 
+    @GetMapping("/weather/{date}")
+    public String forecastForDay(@PathVariable String date) throws IOException, InterruptedException {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://api.weatherapi.com/v1/forecast.json?key=727bb15bfd014c1487795606242102&q=Sarajevo&days=3&aqi=no&alerts=no"))
+                .header("Content-Type", "application/json")
+                .GET()
+                .build();
+
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        ObjectMapper objectMapper = new ObjectMapper();
+        WeatherResponse weatherresponse = objectMapper.readValue(response.body(), WeatherResponse.class);
+
+        Days forecastForDate=null;
+        for(Days data : weatherresponse.getForecast().getForecastday()) {
+            if(data.getDate().equals(date)) {
+                forecastForDate=data;
+                break;
+            }
+        }
+
+        if(forecastForDate!=null) {
+            float maxTemp_c = forecastForDate.getDay().getMaxtemp_c();
+            float minTemp_c = forecastForDate.getDay().getMintemp_c();
+            float avgTemp_c = forecastForDate.getDay().getAvgtemp_c();
+            String text = forecastForDate.getDay().getCondition().getText();
+
+            return "Forecast for " + date + ": MaxTemp: " + maxTemp_c + ", MinTemp: " + minTemp_c +
+                    ", AvgTemp: " + avgTemp_c + ", Condition: " + text;
+        } else {
+            return "No Forecast for that date";
+        }
+    }
 
 
 

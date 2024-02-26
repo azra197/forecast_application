@@ -9,7 +9,7 @@ import lombok.Data;
 public class Day {
 
     private float maxtemp_c;
-    private double mintemp_c;
-    private double avgtemp_c;
+    private float mintemp_c;
+    private float avgtemp_c;
     private Condition condition;
 }
