@@ -9,8 +9,11 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 @RequestMapping
@@ -46,8 +49,8 @@ public class UserController {
         ObjectMapper objectMapper = new ObjectMapper();
         WeatherResponse weatherresponse = objectMapper.readValue(response.body(), WeatherResponse.class);
 
-        List<String>listForThreeDays = new ArrayList<>();
-        for(Days data : weatherresponse.getForecast().getForecastday()) {
+        List<String> listForThreeDays = new ArrayList<>();
+        for (Days data : weatherresponse.getForecast().getForecastday()) {
             String dataForcast = "Forecast for " + data.getDate() + " ,Max temeprature: " + data.getDay().getMaxtemp_c()
                     + " ,Min temeprature: " + data.getDay().getMintemp_c() + " ,Average temeprature: " + data.getDay().getAvgtemp_c()
                     + " ,Condition: " + data.getDay().getCondition().getText();
@@ -57,8 +60,9 @@ public class UserController {
 
     }
 
-    @GetMapping("/weather/{date}")
-    public String forecastForDay(@PathVariable String date) throws IOException, InterruptedException {
+    @GetMapping("/weather/{day}")
+    public String forecastForDay(@PathVariable String day) throws IOException, InterruptedException {
+
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://api.weatherapi.com/v1/forecast.json?key=727bb15bfd014c1487795606242102&q=Sarajevo&days=3&aqi=no&alerts=no"))
@@ -66,34 +70,49 @@ public class UserController {
                 .GET()
                 .build();
 
-
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         ObjectMapper objectMapper = new ObjectMapper();
         WeatherResponse weatherresponse = objectMapper.readValue(response.body(), WeatherResponse.class);
 
-        Days forecastForDate=null;
-        for(Days data : weatherresponse.getForecast().getForecastday()) {
-            if(data.getDate().equals(date)) {
-                forecastForDate=data;
-                break;
-            }
-        }
-
-        if(forecastForDate!=null) {
-            float maxTemp_c = forecastForDate.getDay().getMaxtemp_c();
-            float minTemp_c = forecastForDate.getDay().getMintemp_c();
-            float avgTemp_c = forecastForDate.getDay().getAvgtemp_c();
-            String text = forecastForDate.getDay().getCondition().getText();
-
-            return "Forecast for " + date + ": MaxTemp: " + maxTemp_c + ", MinTemp: " + minTemp_c +
-                    ", AvgTemp: " + avgTemp_c + ", Condition: " + text;
+        String forecastForDay = getForecastForDay(weatherresponse, day);
+        if (forecastForDay != null) {
+            return forecastForDay;
         } else {
-            return "No Forecast for that date";
+            return "There is no provided forecast for " + day;
         }
     }
 
 
+    public static String getForecastForDay(WeatherResponse weatherresponse, String day) {
+        LocalDate today = LocalDate.now();
+        LocalDate specificDate = today;
 
+        while(!specificDate.getDayOfWeek().toString().equalsIgnoreCase(day)) {
+            specificDate=specificDate.plusDays(1);
+        }
+
+        String specificDateStr=specificDate.toString();
+
+        for (Days data : weatherresponse.getForecast().getForecastday()) {
+//            String dayOfWeek = LocalDate.parse(data.getDate()).getDayOfWeek().toString().toUpperCase();
+
+            if (data.getDate().equals(specificDateStr)) {
+
+                float maxTemp_c = data.getDay().getMaxtemp_c();
+                float minTemp_c = data.getDay().getMintemp_c();
+                float avgTemp_c = data.getDay().getAvgtemp_c();
+                String text = data.getDay().getCondition().getText();
+
+                return "Forecast for " + day + ": MaxTemp: " + maxTemp_c + ", MinTemp: " + minTemp_c +
+                        ", AvgTemp: " + avgTemp_c + ", Condition: " + text;
+            } else {
+                return "No Forecast for that date";
+            }
+
+
+        }
+        return null;
+    }
 }
 
 
