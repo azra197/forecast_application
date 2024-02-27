@@ -34,34 +34,32 @@ public class UserController {
 //        return du;
 //    }
 
+    private final Map<String, WeatherForecastData> forecastMap=new HashMap<>();
+
     @GetMapping("/forecast")
-    public List<String> forecastForThreeDays() throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://api.weatherapi.com/v1/forecast.json?key=727bb15bfd014c1487795606242102&q=Sarajevo&days=3&aqi=no&alerts=no"))
-                .header("Content-Type", "application/json")
-                .GET()
-                .build();
-
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        ObjectMapper objectMapper = new ObjectMapper();
-        WeatherResponse weatherresponse = objectMapper.readValue(response.body(), WeatherResponse.class);
-
-
-        List<String> listForThreeDays = new ArrayList<>();
-        for (Days data : weatherresponse.getForecast().getForecastday()) {
-            String dataForcast = "Forecast for " + data.getDate() + " ,Max temeprature: " + data.getDay().getMaxtemp_c()
-                    + " ,Min temeprature: " + data.getDay().getMintemp_c() + " ,Average temeprature: " + data.getDay().getAvgtemp_c()
-                    + " ,Condition: " + data.getDay().getCondition().getText();
-            listForThreeDays.add(dataForcast);
+    public Map<String, WeatherForecastData> forecastForThreeDays() throws IOException, InterruptedException {
+        if(forecastMap.isEmpty()) {
+            getForecastForDay();
         }
-        return listForThreeDays;
-  }
+        return forecastMap;
+    }
 
 
     @GetMapping("/weather/{day}")
     public String forecastForDay(@PathVariable String day) throws IOException, InterruptedException {
+        if(forecastMap.isEmpty()) {
+            getForecastForDay();
+        }
+        WeatherForecastData forecast=forecastMap.get(day.toLowerCase());
+        if(forecast!=null) {
+            return "Forecast for " + day + forecast.toString();
+        } else {
+            return "There is no provided forecast for" + day;
+        }
+    }
+
+
+    private void getForecastForDay() throws IOException, InterruptedException {
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -74,42 +72,20 @@ public class UserController {
         ObjectMapper objectMapper = new ObjectMapper();
         WeatherResponse weatherresponse = objectMapper.readValue(response.body(), WeatherResponse.class);
 
-        String forecastForDay = getForecastForDay(weatherresponse, day);
-        if (forecastForDay != null) {
-            return forecastForDay;
-        } else {
-            return "There is no provided forecast for " + day;
+        for (Days data : weatherresponse.getForecast().getForecastday()) {
+            String dayOfWeek = getDayFromDate(data.getDate());
+            float maxTemp_c = data.getDay().getMaxtemp_c();
+            float minTemp_c = data.getDay().getMintemp_c();
+            float avgTemp_c = data.getDay().getAvgtemp_c();
+            String text = data.getDay().getCondition().getText();
+            WeatherForecastData forecast = new WeatherForecastData(maxTemp_c, minTemp_c, avgTemp_c, text);
+            forecastMap.put(dayOfWeek.toLowerCase(), forecast);
+
         }
     }
-
-
-    public static String getForecastForDay(WeatherResponse weatherresponse, String day) {
-        LocalDate today = LocalDate.now();
-        LocalDate specificDate = today;
-
-        while(!((specificDate.getDayOfWeek()).toString()).equals(day)){
-            specificDate=specificDate.plusDays(1);
-            System.out.print(specificDate);
-        }
-
-        String specificDateStr=specificDate.toString();
-
-        for (Days data : weatherresponse.getForecast().getForecastday()) {
-
-            if ((data.getDate()).equals(specificDateStr)) {
-
-                float maxTemp_c = data.getDay().getMaxtemp_c();
-                float minTemp_c = data.getDay().getMintemp_c();
-                float avgTemp_c = data.getDay().getAvgtemp_c();
-                String text = data.getDay().getCondition().getText();
-
-                return "Forecast for " + day + ": MaxTemp: " + maxTemp_c + ", MinTemp: " + minTemp_c +
-                        ", AvgTemp: " + avgTemp_c + ", Condition: " + text;
-            } else {
-                continue;
-            }
-        }
-        return null;
+    private String getDayFromDate(String date) {
+        LocalDate localDate=LocalDate.parse(date);
+        return localDate.getDayOfWeek().toString();
     }
 
 }

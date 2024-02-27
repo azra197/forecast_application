@@ -8,7 +8,4 @@ import lombok.Data;
 
 public class Condition {
     private String text;
-
-    private int code;
-
 }
