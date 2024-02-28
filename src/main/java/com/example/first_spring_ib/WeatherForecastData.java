@@ -17,7 +17,7 @@ import lombok.Data;
         public String toString() {
             return  ": Max temeprature: " + getMaxtemp_c()
                     + " ,Min temeprature: " + getMintemp_c() + " ,Average temeprature: " + getAvgtemp_c()
-                    + " ,Condition: " + condition;
+                    + " ,Condition: " + getCondition();
         }
     }
 
