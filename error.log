@@ -1,0 +1,2 @@
+16:20:23.426 [scheduling-1] ERROR c.e.first_spring_ib.UserController -Error while fetching data: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target 
+16:20:45.544 [scheduling-1] ERROR c.e.first_spring_ib.UserController -Error while fetching data: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target 

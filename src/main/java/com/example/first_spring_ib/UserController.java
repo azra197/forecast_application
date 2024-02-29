@@ -1,5 +1,7 @@
 package com.example.first_spring_ib;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
@@ -20,33 +22,19 @@ import java.util.*;
 @RequestMapping
 public class UserController {
 
-//    User user;
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-//    @GetMapping("/api/math/sum")
-//    public int sum(@RequestParam(name = "a") int no1, @RequestParam("b") int no2) {
-//        return no1 + no2;
-//    }
-//
-//    @PostMapping("/api/generate/model")
-//    @ResponseBody
-//    public DateUser person(@RequestParam int day, @RequestParam int month, @RequestParam int year, @RequestBody User user) {
-//        DateUser du = new DateUser();
-//        du.setUser(user);
-//        du.setDate(day + "." + month + "." + year);
-//        return du;
-//    }
-
-
-    private Map<String, WeatherForecastData> forecastMap = new HashMap<>();
+    private final Map<String, WeatherForecastData> forecastMap = new HashMap<>();
 
     @GetMapping("/forecast")
     public List<String> forecastForThreeDays() throws IOException, InterruptedException {
+        logger.info("GET /forecast");
         List<String> listForThreeDays = new ArrayList<>();
         for (Map.Entry<String, WeatherForecastData> entry : forecastMap.entrySet()) {
             String day = entry.getKey();
             WeatherForecastData weatherForecastData = entry.getValue();
-            String forecast = " Forecast for " + day + ": Max temeprature: " + weatherForecastData.getMaxtemp_c()
-                    + " ,Min temeprature: " + weatherForecastData.getMintemp_c() + " ,Average temeprature: " + weatherForecastData.getAvgtemp_c()
+            String forecast = " Forecast for " + day + ": Max temperature: " + weatherForecastData.getMaxtemp_c()
+                    + " ,Min temperature: " + weatherForecastData.getMintemp_c() + " ,Average temperature: " + weatherForecastData.getAvgtemp_c()
                     + " ,Condition: " + weatherForecastData.getCondition();
             listForThreeDays.add(forecast);
         }
@@ -56,10 +44,11 @@ public class UserController {
 
     @GetMapping("/weather/{day}")
     public String forecastForDay(@PathVariable String day) throws IOException, InterruptedException {
+        logger.info("GET /weather/{}", day);
         WeatherForecastData weatherForecastData = forecastMap.get(day);
         if (weatherForecastData != null) {
-            return " Forecast for " + day + ": Max temeprature: " + weatherForecastData.getMaxtemp_c()
-                    + " ,Min temeprature: " + weatherForecastData.getMintemp_c() + " ,Average temeprature: " + weatherForecastData.getAvgtemp_c()
+            return " Forecast for " + day + ": Max temperature: " + weatherForecastData.getMaxtemp_c()
+                    + " ,Min temperature: " + weatherForecastData.getMintemp_c() + " ,Average temperature: " + weatherForecastData.getAvgtemp_c()
                     + " ,Condition: " + weatherForecastData.getCondition();
         } else {
             return "There is no provided forecast for" + day;
@@ -68,7 +57,8 @@ public class UserController {
 
     @Scheduled(fixedRate = 36000000)
     private void getForecastForDay() {
-        try(HttpClient client = HttpClient.newHttpClient()) {
+        logger.debug("Fetching forecast data ");
+        try (HttpClient client = HttpClient.newHttpClient()) {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("http://api.weatherapi.com/v1/forecast.json?key=727bb15bfd014c1487795606242102&q=Sarajevo&days=3&aqi=no&alerts=no"))
                     .header("Content-Type", "application/json")
@@ -76,12 +66,13 @@ public class UserController {
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            logger.info("API response : {}", response.body());
             ObjectMapper objectMapper = new ObjectMapper();
             WeatherResponse weatherresponse = objectMapper.readValue(response.body(), WeatherResponse.class);
 
             updateForecastMap(weatherresponse);
-        }catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+        } catch (IOException | InterruptedException e) {
+            logger.error("Error while fetching data: " + e.getMessage());
         }
     }
 
