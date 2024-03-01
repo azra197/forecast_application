@@ -2,7 +2,6 @@ package com.example.first_spring_ib;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,43 +12,32 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping
-public class UserController {
+public class ForecastController {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ForecastController.class);
 
     private final Map<String, WeatherForecastData> forecastMap = new HashMap<>();
 
     @GetMapping("/forecast")
-    public List<String> forecastForThreeDays() throws IOException, InterruptedException {
+    public List<String> threeDaysForecast() {
         logger.info("GET /forecast");
-        List<String> listForThreeDays = new ArrayList<>();
-        for (Map.Entry<String, WeatherForecastData> entry : forecastMap.entrySet()) {
-            String day = entry.getKey();
-            WeatherForecastData weatherForecastData = entry.getValue();
-            String forecast = " Forecast for " + day + ": Max temperature: " + weatherForecastData.getMaxtemp_c()
-                    + " ,Min temperature: " + weatherForecastData.getMintemp_c() + " ,Average temperature: " + weatherForecastData.getAvgtemp_c()
-                    + " ,Condition: " + weatherForecastData.getCondition();
-            listForThreeDays.add(forecast);
-        }
-        return listForThreeDays;
+        return forecastMap.entrySet().stream().map(this::getForecastFor3Days)
+                .collect(Collectors.toList());
     }
 
 
     @GetMapping("/weather/{day}")
-    public String forecastForDay(@PathVariable String day) throws IOException, InterruptedException {
+    public String dayForecast(@PathVariable String day) {
         logger.info("GET /weather/{}", day);
         WeatherForecastData weatherForecastData = forecastMap.get(day);
         if (weatherForecastData != null) {
-            return " Forecast for " + day + ": Max temperature: " + weatherForecastData.getMaxtemp_c()
-                    + " ,Min temperature: " + weatherForecastData.getMintemp_c() + " ,Average temperature: " + weatherForecastData.getAvgtemp_c()
-                    + " ,Condition: " + weatherForecastData.getCondition();
+            return getForecastForOneDay(day,weatherForecastData);
         } else {
             return "There is no provided forecast for" + day;
         }
@@ -76,15 +64,29 @@ public class UserController {
         }
     }
 
+    private String getForecastFor3Days(Map.Entry<String, WeatherForecastData> entry) {
+        String day = entry.getKey();
+        WeatherForecastData weatherForecastData = entry.getValue();
+        return String.format("Forecast for %s: Max temperature: %.1f, Min temperature: %.1f ,Average temperature: %.1f, Condition: %s",
+                day, weatherForecastData.getMaxTempC(), weatherForecastData.getMinTempC(),
+                weatherForecastData.getAvgTempC(), weatherForecastData.getCondition());
+    }
+
+    private String getForecastForOneDay(String day, WeatherForecastData weatherForecastData) {
+        return String.format("Forecast for %s: Max temperature: %.1f, Min temperature: %.1f, Average temperature: %.1f, Condition: %s",
+                day, weatherForecastData.getMaxTempC(), weatherForecastData.getMinTempC(),
+                weatherForecastData.getAvgTempC(), weatherForecastData.getCondition());
+    }
+
     private void updateForecastMap(WeatherResponse weatherresponse) {
         forecastMap.clear();
 
         for (Days data : weatherresponse.getForecast().getForecastday()) {
             String dayOfWeek = getDayFromDate(data.getDate());
             WeatherForecastData weatherForecastData = new WeatherForecastData(
-                    data.getDay().getMaxtemp_c(),
-                    data.getDay().getMintemp_c(),
-                    data.getDay().getAvgtemp_c(),
+                    data.getDay().getMaxTempC(),
+                    data.getDay().getMinTempC(),
+                    data.getDay().getAvgTempC(),
                     data.getDay().getCondition().getText()
             );
 

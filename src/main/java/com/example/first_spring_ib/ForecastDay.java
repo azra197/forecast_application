@@ -1,7 +1,9 @@
 package com.example.first_spring_ib;
 
-import java.util.List;
+import lombok.Data;
 
+import java.util.List;
+@Data
 public class ForecastDay {
     private List<Days> days;
 
