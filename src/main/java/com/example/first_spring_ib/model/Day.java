@@ -1,5 +1,6 @@
-package com.example.first_spring_ib;
+package com.example.first_spring_ib.model;
 
+import com.example.first_spring_ib.model.Condition;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

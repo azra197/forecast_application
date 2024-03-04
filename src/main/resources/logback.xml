@@ -7,7 +7,7 @@
 </appender>
 
 <appender name="INFO_FILE" class="ch.qos.logback.core.FileAppender">
-    <file>/home/amuratovic/first_spring_ib/info.log</file>
+    <file>info.log</file>
     <encoder>
         <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} -%msg %n</pattern>
     </encoder>
@@ -19,7 +19,7 @@
 </appender>
 
 <appender name="ERROR_FILE" class="ch.qos.logback.core.FileAppender">
-    <file>/home/amuratovic/first_spring_ib/error.log</file>
+    <file>error.log</file>
     <encoder>
         <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} -%msg %n</pattern>
     </encoder>
@@ -30,13 +30,15 @@
     </filter>
 </appender>
 
-<logger name="com.example.first_spring_ib" level="error">
+<root level="INFO">
     <appender-ref ref="CONSOLE"/>
+</root>
+
+<logger name="com.example.first_spring_ib" level="error">
     <appender-ref ref="ERROR_FILE"/>
 </logger>
 
 <logger name="com.example.first_spring_ib" level="info">
-    <appender-ref ref="CONSOLE"/>
     <appender-ref ref="INFO_FILE"/>
 </logger>
 

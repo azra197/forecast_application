@@ -19,11 +19,5 @@ public class WeatherForecastData {
         this.avgTempC = avgTempC;
         this.condition = condition;
     }
-
-    public String toString() {
-        return ": Max temeprature: " + getMaxTempC()
-                + " ,Min temeprature: " + getMinTempC() + " ,Average temeprature: " + getAvgTempC()
-                + " ,Condition: " + getCondition();
-    }
 }
 

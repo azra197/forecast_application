@@ -1,4 +1,4 @@
-package com.example.first_spring_ib;
+package com.example.first_spring_ib.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
@@ -7,5 +7,5 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown=true)
 
 public class Condition {
-    private String text;
+    protected String text;
 }
