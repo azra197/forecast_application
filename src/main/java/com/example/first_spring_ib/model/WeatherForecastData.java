@@ -1,4 +1,4 @@
-package com.example.first_spring_ib;
+package com.example.first_spring_ib.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

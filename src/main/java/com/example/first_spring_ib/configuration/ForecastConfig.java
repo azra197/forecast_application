@@ -1,5 +1,6 @@
-package com.example.first_spring_ib;
+package com.example.first_spring_ib.configuration;
 
+import com.example.first_spring_ib.model.WeatherForecastData;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

@@ -1,6 +1,6 @@
 package com.example.first_spring_ib.service;
 
-import com.example.first_spring_ib.WeatherForecastData;
+import com.example.first_spring_ib.model.WeatherForecastData;
 import com.example.first_spring_ib.controller.ForecastController;
 import com.example.first_spring_ib.model.Days;
 import com.example.first_spring_ib.model.WeatherResponse;
@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -27,6 +28,9 @@ public class ForecastService {
 
     @Autowired
     private Map<String, WeatherForecastData> forecastMap;
+
+    @Value("${api.key}")
+    private String weatherApiKey;
 
     public List<String> getForecastFor3Days() {
         return forecastMap.entrySet().stream().map(this::formatForecast3DMap)
@@ -59,7 +63,7 @@ public class ForecastService {
     public WeatherResponse fetchForecastData() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://api.weatherapi.com/v1/forecast.json?key=727bb15bfd014c1487795606242102&q=Sarajevo&days=3&aqi=no&alerts=no"))
+                .uri(URI.create(weatherApiKey))
                 .header("Content-Type", "application/json")
                 .GET()
                 .build();
