@@ -1,9 +1,15 @@
 package com.example.first_spring_ib.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Data
+@RequiredArgsConstructor
+@AllArgsConstructor
 public class WeatherForecastData {
     @JsonProperty("maxtemp_c")
     private float maxTempC;
@@ -13,11 +19,7 @@ public class WeatherForecastData {
     private float avgTempC;
     private String condition;
 
-    public WeatherForecastData(float maxTempC, float minTempC, float avgTempC, String condition) {
-        this.maxTempC = maxTempC;
-        this.minTempC = minTempC;
-        this.avgTempC = avgTempC;
-        this.condition = condition;
+    public WeatherForecastData(BigDecimal maxtempC, BigDecimal mintempC, BigDecimal avgtempC, String text) {
     }
 }
 

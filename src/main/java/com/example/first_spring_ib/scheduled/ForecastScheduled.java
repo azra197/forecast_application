@@ -1,10 +1,12 @@
 package com.example.first_spring_ib.scheduled;
 
+import com.example.first_spring_ib.model.MyException;
 import com.example.first_spring_ib.service.ForecastService;
 import com.example.first_spring_ib.model.WeatherResponse;
 import com.example.first_spring_ib.controller.ForecastController;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.ApisApi;
+import io.swagger.client.model.Forecast;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +28,18 @@ public class ForecastScheduled {
         logger.debug("Fetching forecast data ");
         try {
             WeatherResponse weatherResponse = forecastService.fetchForecastData();
-            forecastService.updateForecastMap(weatherResponse);
-        } catch (IOException | ApiException | InterruptedException e) {
-            logger.error("Error while fetching data: " + e.getMessage());
+            forecastService.updateForecastMap(weatherResponse.getForecast());
+
+        }catch (MyException e) {
+            logger.error("Error in MyException", e);
+
+        } catch (ApiException e) {
+            logger.error(String.valueOf(e.getCode()));
+            logger.error(e.getResponseBody());
+            logger.error(e.getResponseHeaders().toString());
+        } catch (Exception e) {
+            logger.error("Error while fetching data: ", e);
+
         }
     }
 
