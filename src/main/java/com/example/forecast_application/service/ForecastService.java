@@ -1,26 +1,27 @@
-package com.example.first_spring_ib.service;
+package com.example.forecast_application.service;
 
-import com.example.first_spring_ib.model.MyException;
-import com.example.first_spring_ib.model.WeatherForecastData;
-import com.example.first_spring_ib.model.WeatherResponse;
+import com.example.forecast_application.model.Days;
+import com.example.forecast_application.model.Forecast;
+import com.example.forecast_application.model.WeatherForecastData;
+import com.example.forecast_application.model.WeatherResponse;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.client.ApiClient;
-import io.swagger.client.ApiException;
-import io.swagger.client.auth.ApiKeyAuth;
-import io.swagger.client.api.ApisApi;
-import io.swagger.client.model.Forecast;
-import io.swagger.client.model.ForecastForecastday;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.threeten.bp.LocalDate;
+
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -66,42 +67,29 @@ public class ForecastService {
                 weatherForecastData.getAvgTempC(), weatherForecastData.getCondition());
     }
 
-    public WeatherResponse fetchForecastData() throws IOException, MyException, InterruptedException, ApiException {
-        ApiClient defaultClient = new ApiClient();
+    public WeatherResponse fetchForecastData() throws IOException, InterruptedException {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://api.weatherapi.com/v1/forecast.json?key=727bb15bfd014c1487795606242102&q=Sarajevo&days=3&aqi=no&alerts=no"))                .header("Content-Type", "application/json")
+                .GET()
+                .build();
 
-        ApiKeyAuth ApiKeyAuth = (ApiKeyAuth) defaultClient.getAuthentication("ApiKeyAuth");
-        ApiKeyAuth.setApiKey(weatherApiKey);
-
-        ApisApi apiInstance = new ApisApi(defaultClient);
-        String q = "Sarajevo";
-        Integer days = 3;
-        LocalDate dt = LocalDate.now();
-        Integer unixdt = null;
-        Integer hour = null;
-        String lang = null;
-        String alerts = "no";
-        String aqi = "no";
-        Integer tp = null;
-
-        Object result = apiInstance.forecastWeather(q, days, dt, null, null, null, alerts, aqi, tp);
-
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        logger.info("API response : {}", response.body());
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        return objectMapper.readValue(objectMapper.writeValueAsString(result), WeatherResponse.class);
-
-
+        objectMapper.registerModule(new JavaTimeModule());
+        return objectMapper.readValue(response.body(), WeatherResponse.class);
     }
 
     public void updateForecastMap(Forecast forecast) {
         forecastMap.clear();
-
-        for (ForecastForecastday forecastDay : forecast.getForecastday()) {
-            String dayOfWeek = getDayFromDate(String.valueOf(forecastDay.getDate()));
+        for (Days days : forecast.getForecastDay()) {
+            String dayOfWeek = getDayFromDate(String.valueOf(days.getDate()));
             WeatherForecastData weatherForecastData = new WeatherForecastData(
-                    forecastDay.getDay().getMaxtempC(),
-                    forecastDay.getDay().getMintempC(),
-                    forecastDay.getDay().getAvgtempC(),
-                    forecastDay.getDay().getCondition().getText()
+                    days.getDay().getMaxTempC(),
+                    days.getDay().getMinTempC(),
+                    days.getDay().getAvgTempC(),
+                    days.getDay().getCondition().getText()
             );
 
             forecastMap.put(dayOfWeek.toLowerCase(), weatherForecastData);
@@ -109,7 +97,8 @@ public class ForecastService {
     }
 
     private String getDayFromDate(String date) {
-        java.time.LocalDate localDate = java.time.LocalDate.parse(date);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(date, formatter);
         return localDate.getDayOfWeek().toString();
     }
 }

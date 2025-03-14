@@ -1,4 +1,4 @@
-package com.example.first_spring_ib;
+package com.example.forecast_application;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

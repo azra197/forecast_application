@@ -1,14 +1,14 @@
-package com.example.first_spring_ib.model;
+package com.example.forecast_application.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Data
-@RequiredArgsConstructor
+@NoArgsConstructor
 @AllArgsConstructor
 public class WeatherForecastData {
     @JsonProperty("maxtemp_c")

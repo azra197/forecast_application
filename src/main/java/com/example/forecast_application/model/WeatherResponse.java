@@ -1,7 +1,6 @@
-package com.example.first_spring_ib.model;
+package com.example.forecast_application.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import io.swagger.client.model.Forecast;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

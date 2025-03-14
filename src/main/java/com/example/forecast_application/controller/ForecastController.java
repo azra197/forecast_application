@@ -1,10 +1,9 @@
-package com.example.first_spring_ib.controller;
+package com.example.forecast_application.controller;
 
-import com.example.first_spring_ib.service.ForecastService;
+import com.example.forecast_application.service.ForecastService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -15,7 +14,7 @@ import java.util.*;
 public class ForecastController {
 
     private static final Logger logger = LoggerFactory.getLogger(ForecastController.class);
-    
+
     private final ForecastService forecastService;
 
     @GetMapping("/forecast")

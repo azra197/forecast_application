@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>first_spring_ib</artifactId>
+	<artifactId>forecast_application</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>first_spring_ib</name>
-	<description>first_spring_ib</description>
+	<name>forecast_application</name>
+	<description>forecast_application</description>
 	<properties>
 		<java.version>21</java.version>
 		<gson-fire-version>1.8.3</gson-fire-version>

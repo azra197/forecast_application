@@ -1,6 +1,5 @@
-package com.example.first_spring_ib.model;
+package com.example.forecast_application.model;
 
-import com.example.first_spring_ib.model.Days;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import java.util.List;

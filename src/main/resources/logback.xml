@@ -34,11 +34,11 @@
     <appender-ref ref="CONSOLE"/>
 </root>
 
-<logger name="com.example.first_spring_ib" level="error">
+<logger name="com.example.forecast_application" level="error">
     <appender-ref ref="ERROR_FILE"/>
 </logger>
 
-<logger name="com.example.first_spring_ib" level="info">
+<logger name="com.example.forecast_application" level="info">
     <appender-ref ref="INFO_FILE"/>
 </logger>
 

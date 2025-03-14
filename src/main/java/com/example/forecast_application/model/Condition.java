@@ -1,4 +1,4 @@
-package com.example.first_spring_ib.model;
+package com.example.forecast_application.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

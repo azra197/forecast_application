@@ -1,4 +1,4 @@
-package com.example.first_spring_ib;
+package com.example.forecast_application;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
