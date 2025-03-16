@@ -39,6 +39,10 @@ mvn spring-boot:run
 ```
 http://localhost:8080/forecast
 ```
+or
+```
+http://localhost:8080/weather/{day}
+```
 
 ## Example Response
 GET /weather/Monday
